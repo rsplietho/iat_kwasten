@@ -1,3 +1,8 @@
+import RPi.GPIO as GPIO
+
+GPIO.setmode(GPIO.BCM)
+
+
 def main():
     print("hello world")
 

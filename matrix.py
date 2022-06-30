@@ -23,9 +23,6 @@ def matrix(matrixString, matrix):
         time.sleep(0.5)
 
 def main():
-    # asyncio.run(matrix("dinges", 0))
-    # print('test')
-    # asyncio.run(matrix("Peer", 1))
     matrix0 = threading.Thread(target=matrix, args=("dinges", 0,))
     matrix1 = threading.Thread(target=matrix, args=("peren", 1,))
     matrix0.start()

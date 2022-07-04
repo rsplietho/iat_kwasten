@@ -22,20 +22,36 @@ class Charlieplexing:
         self.charliePins = charlie_pins
         self.charlieLEDS = initCharlieLeds(self.charliePins)
         print("init end")
-        
+    
+    # def lightLED(led):
+    #     self.igniteled(led)
 
     def lightLED(self, led):
         #First clear the pins, by setting them all to input
+
         for pin in self.charliePins:
             GPIO.setup(pin,GPIO.IN)
+
+
+        for pin in self.charliePins:
+            print("Pin "+str(pin)+": "+str(GPIO.input(pin)))
         
         #Now setup the first pin for HIGH OUTPUT
-        GPIO.setup(self.charlieLEDS[led],GPIO.OUT)
-        GPIO.output(self.charlieLEDS[led],GPIO.HIGH)
+        GPIO.setup(self.charlieLEDS[led][0],GPIO.OUT)
+        GPIO.output(self.charlieLEDS[led][0],GPIO.HIGH)
         
         #Now setup the second pin for LOW OUTPUT
-        GPIO.setup(self.charlieLEDS[led],GPIO.OUT)
-        GPIO.output(self.charlieLEDS[led],GPIO.LOW)
+        GPIO.setup(self.charlieLEDS[led][1],GPIO.OUT)
+        GPIO.output(self.charlieLEDS[led][1],GPIO.LOW)
+
+        for pin in self.charliePins:
+            print("Pin "+str(pin)+": "+str(GPIO.input(pin)))
+        print("")
+
+    def clearLEDS(self):
+        for pin in self.charliePins:
+            GPIO.setup(pin,GPIO.IN)
+
 
 
 

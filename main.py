@@ -19,6 +19,8 @@ cs0 = digitalio.DigitalInOut(board.CE0)
 cs1 = digitalio.DigitalInOut(board.CE1)
 cs2 = digitalio.DigitalInOut(board.D20)
 cs3 = digitalio.DigitalInOut(board.D21)
+cs4 = digitalio.DigitalInOut(board.D12)
+cs5 = digitalio.DigitalInOut(board.D13)
 
 mcp0 = MCP.MCP3008(spi, cs0)
 mcp1 = MCP.MCP3008(spi, cs1)
@@ -28,7 +30,7 @@ matrixen = [
     matrices.Matrix8x8(spi, cs3)
     ]
 
-A = [
+AP1 = [
 AnalogIn(mcp0, MCP.P0),
 AnalogIn(mcp0, MCP.P1),
 AnalogIn(mcp0, MCP.P2),
@@ -36,26 +38,31 @@ AnalogIn(mcp0, MCP.P3),
 AnalogIn(mcp0, MCP.P4),
 AnalogIn(mcp0, MCP.P5),
 AnalogIn(mcp0, MCP.P6),
-AnalogIn(mcp0, MCP.P7),
-AnalogIn(mcp1, MCP.P0),
-AnalogIn(mcp1, MCP.P1),
-AnalogIn(mcp1, MCP.P2),
-AnalogIn(mcp1, MCP.P3),
-AnalogIn(mcp1, MCP.P4),
-AnalogIn(mcp1, MCP.P5),
-AnalogIn(mcp1, MCP.P6),
-AnalogIn(mcp1, MCP.P7)
+AnalogIn(mcp0, MCP.P7)
 ]
 
-cs_sr = digitalio.DigitalInOut(board.D12)
-sr = adafruit_74hc595.ShiftRegister74HC595(spi, cs_sr)
+AP2 = [
+    AnalogIn(mcp1, MCP.P0),
+    AnalogIn(mcp1, MCP.P1),
+    AnalogIn(mcp1, MCP.P2),
+    AnalogIn(mcp1, MCP.P3),
+    AnalogIn(mcp1, MCP.P4),
+    AnalogIn(mcp1, MCP.P5),
+    AnalogIn(mcp1, MCP.P6),
+    AnalogIn(mcp1, MCP.P7)
+]
 
-LED = [sr.get_pin(n) for n in range(8)]
+sr0 = adafruit_74hc595.ShiftRegister74HC595(spi, cs4)
+sr1 = adafruit_74hc595.ShiftRegister74HC595(spi, cs5)
+
+LED = [sr1.get_pin(n) for n in range(8)]
+LED.append(sr1.get_pin(0))
+LED.append(sr1.get_pin(1))
 
 SCORE = [0,0]
 
 def scanLDR(player):
-    LDR = random.randint(0,1)
+    LDR = random.randint(0,4)
     stopconditie = False
     while not stopconditie:
         if A[LDR].value < 10000:

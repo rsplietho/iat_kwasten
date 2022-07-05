@@ -1,5 +1,5 @@
 def main(player):
-    if exec('%s.equals("P1")'%player):
+    if exec('"%s" == "P1"'%player):
         print("ja")
     else:
         print("nee")

@@ -30,18 +30,18 @@ matrixen = [
     matrices.Matrix8x8(spi, cs3)
     ]
 
-AP1 = [
-AnalogIn(mcp0, MCP.P0),
-AnalogIn(mcp0, MCP.P1),
-AnalogIn(mcp0, MCP.P2),
-AnalogIn(mcp0, MCP.P3),
-AnalogIn(mcp0, MCP.P4),
-AnalogIn(mcp0, MCP.P5),
-AnalogIn(mcp0, MCP.P6),
-AnalogIn(mcp0, MCP.P7)
-]
-
-AP2 = [
+A = {
+    "P1": [
+    AnalogIn(mcp0, MCP.P0),
+    AnalogIn(mcp0, MCP.P1),
+    AnalogIn(mcp0, MCP.P2),
+    AnalogIn(mcp0, MCP.P3),
+    AnalogIn(mcp0, MCP.P4),
+    AnalogIn(mcp0, MCP.P5),
+    AnalogIn(mcp0, MCP.P6),
+    AnalogIn(mcp0, MCP.P7)
+    ], 
+    "P2": [
     AnalogIn(mcp1, MCP.P0),
     AnalogIn(mcp1, MCP.P1),
     AnalogIn(mcp1, MCP.P2),
@@ -50,7 +50,7 @@ AP2 = [
     AnalogIn(mcp1, MCP.P5),
     AnalogIn(mcp1, MCP.P6),
     AnalogIn(mcp1, MCP.P7)
-]
+]}
 
 sr0 = adafruit_74hc595.ShiftRegister74HC595(spi, cs4)
 sr1 = adafruit_74hc595.ShiftRegister74HC595(spi, cs5)
@@ -65,7 +65,7 @@ def scanLDR(player):
     LDR = random.randint(0,4)
     stopconditie = False
     while not stopconditie:
-        if A[LDR].value < 10000:
+        if exec('A%s[LDR].value < 10000'%player):
             SCORE[player] += 1
             
 

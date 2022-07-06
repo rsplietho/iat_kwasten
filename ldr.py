@@ -40,7 +40,12 @@ def main():
         # for pin in A:# range(0,3):
         #     print(pin.value)
         # print("")
-        print(A[0].value)
-        time.sleep(0.5)
+        # print(A[0].value)
+        # time.sleep(0.5)
+
+        for ldr in range(16):
+            if(A[ldr].value < 30000):
+                print(ldr, A[ldr].value)
+            time.sleep(0.5)
 
 main()

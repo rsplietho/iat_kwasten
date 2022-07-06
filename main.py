@@ -67,14 +67,19 @@ LED[1].append(sr1.get_pin(1))
 SCORE = [0,0]
 
 def scanLDR(player):
+    eindTijd = time.time() + random.randint(4,6)
+
     LDR = random.randint(0,4)
+    print('Player %i: LDR %i'%(player,LDR))
     LED[player][LDR].value = True
-    stopconditie = False
-    while not stopconditie:
-        if A[player][LDR].value < 10000:
+    while True:
+        huidigeTijd = time.time()
+        print('Player %i: %i'%(player,A[player][LDR].value))
+        if A[player][LDR].value < 30000 or huidigeTijd > eindTijd:   
             LED[player][LDR].value = False
             SCORE[player] += 1
-            scoreBijhouden(player)
+            break
+    scoreBijhouden(player)
 
 def displayGewonnen(player):
     GPIO.setmode(GPIO.BCM)
@@ -89,7 +94,7 @@ def displayGewonnen(player):
 def displayScore(player, score):
     if (score < 10):
         matrixen[player].fill(0)
-        matrixen[player].text(score, 0, 0)
+        matrixen[player].text(str(score), 0, 0)
         matrixen[player].show()
     else:
         raise Exception("score > 9")
@@ -109,6 +114,11 @@ def scoreBijhouden(player):
                 light.value = False
             time.sleep(0.5)
         gameReset(player)
+
+def startGame(player):
+    SCORE[player] = 0
+    displayScore(player, SCORE[player])
+    scanLDR(player)
         
 
 def gameReset(player):
@@ -116,8 +126,10 @@ def gameReset(player):
     scoreBijhouden(player)
 
 def main():
-    player0 = threading.Thread(target=scanLDR, args=(0,))
-    player1 = threading.Thread(target=scanLDR, args=(1,))
+    player0 = threading.Thread(target=startGame, args=(0,))
+    player1 = threading.Thread(target=startGame, args=(1,))
+    player0.start()
+    player1.start()
 
 if (__name__ == "__main__"):
     try:

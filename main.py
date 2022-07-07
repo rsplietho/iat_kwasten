@@ -1,6 +1,6 @@
 from ast import arg
 import RPi.GPIO as GPIO
-# import charlieplexing.py
+import asyncio
 import threading
 import time
 import board
@@ -25,6 +25,10 @@ cs5 = digitalio.DigitalInOut(board.D13)
 
 mcp0 = MCP.MCP3008(spi, cs0)
 mcp1 = MCP.MCP3008(spi, cs1)
+
+B = [27,17]
+GPIO.setup(B[0], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(B[1], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 matrixen = [
     matrices.Matrix8x8(spi, cs2),
@@ -66,20 +70,28 @@ LED[1].append(sr1.get_pin(1))
 
 SCORE = [0,0]
 
-def scanLDR(player):
-    eindTijd = time.time() + random.randint(4,6)
+gebruikteLDR = [[],[]]
 
+def scanLDR(player):
+    eindTijd = time.time() + random.randint(2,3)
     LDR = random.randint(0,4)
+    gebruikteLDR[player].append(LDR)
+    while LDR in gebruikteLDR[player]:
+        LDR = random.randint(0,4)
     print('Player %i: LDR %i'%(player,LDR))
     LED[player][LDR].value = True
     while True:
+        # if GPIO.input(B[player]) == False:
+        #     return
         huidigeTijd = time.time()
         print('Player %i: %i'%(player,A[player][LDR].value))
-        if A[player][LDR].value < 30000 or huidigeTijd > eindTijd:   
+        if A[player][LDR].value < 60000 or huidigeTijd > eindTijd:
+            time.sleep(2)   
             LED[player][LDR].value = False
             SCORE[player] += 1
             break
     scoreBijhouden(player)
+    return("klaar")
 
 def displayGewonnen(player):
     GPIO.setmode(GPIO.BCM)
@@ -92,7 +104,7 @@ def displayGewonnen(player):
     matrixen[player].fill(0)
 
 def displayScore(player, score):
-    if (score < 10):
+    if (score < 5):
         matrixen[player].fill(0)
         matrixen[player].text(str(score), 0, 0)
         matrixen[player].show()
@@ -102,7 +114,6 @@ def displayScore(player, score):
 def scoreBijhouden(player):
     try:
         displayScore(player, SCORE[player])
-        scanLDR(player)
     except:
         gewonnen = threading.Thread(target=displayGewonnen, args=(player,))
         gewonnen.start()
@@ -123,13 +134,39 @@ def startGame(player):
 
 def gameReset(player):
     SCORE[player] = 0
+    gebruikteLDR[player] = []
     scoreBijhouden(player)
 
+async def displayPressStart(player):
+    for char in "Druk op start":
+        matrixen[player].fill(0)
+        matrixen[player].text(char, 0, 0)
+        matrixen[player].show()
+        time.sleep(0.5)
+
+def pressStart(player):
+    while True:
+        if SCORE[player] > 5:
+                gameReset(player)
+        if GPIO.input(B[player]) == False:
+            # gedaan = asyncio.run(scanLDR(player))
+            gedaan = scanLDR(player)
+            while gedaan != "klaar":
+                pass
+            eindTijd = time.time() + 10
+        if SCORE[player] != 0 and time.time() > eindTijd:
+            gameReset(player)
+                 
+
+
 def main():
-    player0 = threading.Thread(target=startGame, args=(0,))
-    player1 = threading.Thread(target=startGame, args=(1,))
+    player0 = threading.Thread(target=pressStart, args=(0,))
+    player1 = threading.Thread(target=pressStart, args=(1,))
     player0.start()
     player1.start()
+
+    # asyncio.run(pressStart(0))
+    # asyncio.run(pressStart(1))
 
 if (__name__ == "__main__"):
     try:
